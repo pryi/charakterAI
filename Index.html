@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat AI Karakter - Gemini</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .typing-dot {
+        animation: typingDots 1.4s infinite both;
+      }
+      .typing-dot:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .typing-dot:nth-child(3) {
+        animation-delay: 0.4s;
+      }
+      @keyframes typingDots {
+        0%,
+        80%,
+        100% {
+          transform: scale(0);
+        }
+        40% {
+          transform: scale(1);
+        }
+      }
+      .message-enter {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+        transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+      }
+      .message-enter-active {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+      .message-actions {
+        opacity: 0;
+        transition: opacity 0.2s ease;
+      }
+      .message-item:hover .message-actions {
+        opacity: 1;
+      }
+      .avatar-option {
+        transition: all 0.2s ease;
+      }
+      .avatar-option:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 0 2px #0ea5e9;
+      }
+      .avatar-option.selected {
+        box-shadow: 0 0 0 3px #0ea5e9;
+        transform: scale(1.05);
+      }
+    </style>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="bg-gradient-to-br from-slate-900 to-slate-800 text-slate-100 flex flex-col items-center justify-center min-h-screen p-4 selection:bg-sky-500 selection:text-white"
+  >
+    <div
+      id="character-creation"
+      class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-50"
+    >
+      <div
+        class="bg-slate-800 rounded-xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-700"
+      >
+        <h2 class="text-2xl font-bold text-center text-sky-400 mb-6">
+          Character Ai
+        </h2>
+
+        <div class="space-y-6">
+          <div>
+            <label
+              for="character-name-input"
+              class="block text-sm font-medium text-slate-300 mb-2"
+              >Nama Karakter</label
+            >
+            <input
+              type="text"
+              id="character-name-input"
+              placeholder="Misal: Luna, Arjuna, dll"
+              class="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 placeholder-slate-400 text-slate-100"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2"
+              >Gender Karakter</label
+            >
+            <div class="flex space-x-4">
+              <label class="flex items-center">
+                <input
+                  type="radio"
+                  name="character-gender"
+                  value="female"
+                  class="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-600"
+                  checked
+                />
+                <span class="ml-2 text-slate-300">Perempuan</span>
+              </label>
+              <label class="flex items-center">
+                <input
+                  type="radio"
+                  name="character-gender"
+                  value="male"
+                  class="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-600"
+                />
+                <span class="ml-2 text-slate-300">Laki-laki</span>
+              </label>
+              <label class="flex items-center">
+                <input
+                  type="radio"
+                  name="character-gender"
+                  value="neutral"
+                  class="h-4 w-4 text-sky-600 focus:ring-sky-500 border-slate-600"
+                />
+                <span class="ml-2 text-slate-300">Netral</span>
+              </label>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-slate-300 mb-2"
+              >Avatar Karakter</label
+            >
+            <div class="grid grid-cols-4 gap-3">
+              <div
+                class="avatar-option rounded-full overflow-hidden cursor-pointer"
+                data-avatar="1"
+              >
+                <img
+                  src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=1"
+                  alt="Avatar 1"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <div
+                class="avatar-option rounded-full overflow-hidden cursor-pointer"
+                data-avatar="2"
+              >
+                <img
+                  src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=2"
+                  alt="Avatar 2"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <div
+                class="avatar-option rounded-full overflow-hidden cursor-pointer"
+                data-avatar="3"
+              >
+                <img
+                  src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=3"
+                  alt="Avatar 3"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <div
+                class="avatar-option rounded-full overflow-hidden cursor-pointer"
+                data-avatar="4"
+              >
+                <img
+                  src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=4"
+                  alt="Avatar 4"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <div
+                class="avatar-option rounded-full overflow-hidden cursor-pointer"
+                data-avatar="5"
+              >
+                <img
+                  src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=5"
+                  alt="Avatar 5"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <div
+                class="avatar-option rounded-full overflow-hidden cursor-pointer"
+                data-avatar="6"
+              >
+                <img
+                  src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=6"
+                  alt="Avatar 6"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <div
+                class="avatar-option rounded-full overflow-hidden cursor-pointer"
+                data-avatar="7"
+              >
+                <img
+                  src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=7"
+                  alt="Avatar 7"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <div
+                class="avatar-option rounded-full overflow-hidden cursor-pointer"
+                data-avatar="8"
+              >
+                <img
+                  src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=8"
+                  alt="Avatar 8"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label
+              for="custom-avatar-upload"
+              class="block text-sm font-medium text-slate-300 mb-2"
+              >Atau Unggah Foto Sendiri</label
+            >
+            <input
+              type="file"
+              id="custom-avatar-upload"
+              accept="image/*"
+              class="w-full p-2 bg-slate-700 text-white rounded-md border border-slate-600"
+            />
+          </div>
+
+          <div class="pt-2">
+            <button
+              id="create-character-btn"
+              class="w-full bg-sky-600 text-white py-3 px-4 rounded-lg hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-800 transition-colors duration-150 font-medium"
+            >
+              Buat Karakter & Mulai Chat
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="chat-container"
+      class="hidden bg-slate-800 shadow-2xl shadow-sky-500/10 rounded-xl w-full max-w-2xl flex flex-col h-[90vh] md:h-[80vh] overflow-hidden border border-slate-700"
+    >
+      <header
+        class="bg-slate-700/50 backdrop-blur-md text-white p-4 sm:p-5 flex items-center justify-between border-b border-slate-700"
+      >
+        <div class="flex items-center space-x-3">
+          <img
+            id="character-avatar"
+            src=""
+            alt="Avatar Karakter"
+            class="cursor-pointer w-10 h-10 sm:w-12 sm:h-12 rounded-full border-2 border-sky-500 object-cover"
+          />
+
+          <div>
+            <h1
+              id="character-name"
+              class="text-lg sm:text-xl font-semibold text-sky-400"
+            ></h1>
+            <p
+              id="character-status"
+              class="text-xs sm:text-sm text-emerald-400"
+            >
+              Online
+            </p>
+          </div>
+        </div>
+
+        <button
+          id="clear-chat-display"
+          class="text-slate-300 hover:text-white p-2 rounded-full hover:bg-slate-700 transition-colors"
+          title="Hapus tampilan percakapan"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-5 w-5"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+            />
+          </svg>
+        </button>
+      </header>
+
+      <div
+        id="chat-window"
+        class="flex-grow p-4 sm:p-6 space-y-4 overflow-y-auto scroll-smooth"
+      ></div>
+
+      <div
+        id="typing-indicator"
+        class="p-4 sm:p-6 pt-0 text-sm text-slate-400 hidden"
+      >
+        <div class="flex items-center space-x-1">
+          <span class="italic" id="typing-text">AI sedang mengetik</span>
+          <div class="typing-dot w-2 h-2 bg-sky-400 rounded-full"></div>
+          <div class="typing-dot w-2 h-2 bg-sky-400 rounded-full"></div>
+          <div class="typing-dot w-2 h-2 bg-sky-400 rounded-full"></div>
+        </div>
+      </div>
+
+      <footer
+        class="bg-slate-800/60 backdrop-blur-md p-3 sm:p-4 border-t border-slate-700"
+      >
+        <div class="flex items-center space-x-2 sm:space-x-3">
+          <textarea
+            id="message-input"
+            rows="1"
+            placeholder="Ketik pesanmu di sini..."
+            class="flex-grow p-3 bg-slate-700 border border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 placeholder-slate-400 text-slate-100 text-sm sm:text-base resize-none overflow-hidden"
+          ></textarea>
+
+          <button
+            id="send-button"
+            class="bg-sky-600 text-white px-5 py-3 rounded-lg hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-800 transition-colors duration-150 active:bg-sky-700"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              class="w-5 h-5"
+            >
+              <path
+                d="M3.105 3.105a.5.5 0 01.815-.093l12 8a.5.5 0 010 .874l-12 8a.5.5 0 01-.815-.782L14.39 10 3.105 3.885a.5.5 0 010-.78z"
+              />
+            </svg>
+          </button>
+        </div>
+      </footer>
+    </div>
+
+    <div
+      id="profile-settings"
+      class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden"
+    >
+      <div
+        class="bg-slate-800 rounded-xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-700 space-y-6"
+      >
+        <h2 class="text-2xl font-bold text-center text-sky-400">
+          Pengaturan Profil
+        </h2>
+        <div>
+          <label class="block text-sm font-medium text-slate-300 mb-2"
+            >Ganti Karakter</label
+          >
+          <div class="grid grid-cols-4 gap-3">
+            <div
+              class="avatar-option rounded-full overflow-hidden cursor-pointer"
+              data-avatar="1"
+            >
+              <img
+                src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=1"
+                alt="Avatar 1"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div
+              class="avatar-option rounded-full overflow-hidden cursor-pointer"
+              data-avatar="2"
+            >
+              <img
+                src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=2"
+                alt="Avatar 2"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div
+              class="avatar-option rounded-full overflow-hidden cursor-pointer"
+              data-avatar="3"
+            >
+              <img
+                src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=3"
+                alt="Avatar 3"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div
+              class="avatar-option rounded-full overflow-hidden cursor-pointer"
+              data-avatar="4"
+            >
+              <img
+                src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=4"
+                alt="Avatar 4"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div
+              class="avatar-option rounded-full overflow-hidden cursor-pointer"
+              data-avatar="5"
+            >
+              <img
+                src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=5"
+                alt="Avatar 5"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div
+              class="avatar-option rounded-full overflow-hidden cursor-pointer"
+              data-avatar="6"
+            >
+              <img
+                src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=6"
+                alt="Avatar 6"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div
+              class="avatar-option rounded-full overflow-hidden cursor-pointer"
+              data-avatar="7"
+            >
+              <img
+                src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=7"
+                alt="Avatar 7"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div
+              class="avatar-option rounded-full overflow-hidden cursor-pointer"
+              data-avatar="8"
+            >
+              <img
+                src="https://api.dicebear.com/7.x/bottts-neutral/svg?seed=8"
+                alt="Avatar 8"
+                class="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+        <div>
+          <label
+            for="custom-avatar-upload-profile"
+            class="block text-sm font-medium text-slate-300 mb-2"
+            >Unggah Foto Profil</label
+          >
+          <input
+            type="file"
+            id="custom-avatar-upload-profile"
+            accept="image/*"
+            class="w-full p-2 bg-slate-700 text-white rounded-md border border-slate-600"
+          />
+        </div>
+        <div class="flex justify-between">
+          <button
+            id="view-history-btn"
+            class="bg-sky-600 text-white py-2 px-4 rounded-lg hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-offset-2 focus:ring-offset-slate-800 transition-colors duration-150 font-medium"
+          >
+            Riwayat Chat
+          </button>
+          <button
+            id="delete-history-btn"
+            class="bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-slate-800 transition-colors duration-150 font-medium"
+          >
+            Hapus Semua Riwayat
+          </button>
+        </div>
+        <div class="mt-2">
+          <button
+            id="logout-btn"
+            class="w-full bg-red-700 text-white py-3 px-4 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 focus:ring-offset-slate-800 transition-colors duration-150 font-medium"
+          >
+            Logout
+          </button>
+        </div>
+        <div class="mt-4 pt-2 border-t border-slate-700">
+          <button
+            id="close-profile-settings-btn"
+            class="w-full bg-slate-600 text-white py-3 px-4 rounded-lg hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-800 transition-colors duration-150 font-medium"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      id="chat-history-modal"
+      class="fixed inset-0 bg-slate-900/90 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden"
+    >
+      <div
+        class="bg-slate-800 rounded-xl max-w-md w-full p-6 sm:p-8 shadow-2xl border border-slate-700 space-y-4"
+      >
+        <h2 class="text-2xl font-bold text-center text-sky-400">
+          Riwayat Chat
+        </h2>
+        <div
+          id="chat-history-list"
+          class="space-y-2 max-h-[300px] overflow-y-auto"
+        ></div>
+        <div class="mt-4 pt-2 border-t border-slate-700">
+          <button
+            id="close-history-modal-btn"
+            class="w-full bg-slate-600 text-white py-3 px-4 rounded-lg hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500 focus:ring-offset-2 focus:ring-offset-slate-800 transition-colors duration-150 font-medium"
+          >
+            Tutup
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const customAvatarInput = document.getElementById("custom-avatar-upload");
+      const customAvatarInputProfile = document.getElementById(
+        "custom-avatar-upload-profile"
+      );
+      const characterAvatarImg = document.getElementById("character-avatar");
+      const avatarOptions = document.querySelectorAll(".avatar-option");
+
+      // Fungsi untuk memperbarui tampilan avatar di header chat
+      function updateCharacterAvatarDisplay() {
+        characterAvatarImg.src = currentCharacter.avatar;
+      }
+
+      customAvatarInput.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            currentCharacter.avatar = event.target.result;
+            updateCharacterAvatarDisplay();
+            avatarOptions.forEach((el) => el.classList.remove("selected"));
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      customAvatarInputProfile.addEventListener("change", function (e) {
+        const file = e.target.files[0];
+        if (file && file.type.startsWith("image/")) {
+          const reader = new FileReader();
+          reader.onload = function (event) {
+            currentCharacter.avatar = event.target.result;
+            updateCharacterAvatarDisplay();
+            saveChatToLocal();
+          };
+          reader.readAsDataURL(file);
+        }
+      });
+
+      // Karakter default
+      let currentCharacter = {
+        characterId: null, // Tambahkan ID unik untuk setiap karakter
+        name: "Gemini AI",
+        gender: "neutral",
+        avatar: "https://api.dicebear.com/7.x/bottts-neutral/svg?seed=default",
+      };
+
+      let currentConversationHistory = []; // Riwayat percakapan untuk karakter aktif
+      let currentChatHistory = []; // Riwayat chat untuk karakter aktif (untuk tampilan dan modal riwayat)
+
+      // Struktur data global untuk menyimpan semua riwayat karakter
+      let allCharactersChatData = {}; // { characterId: { characterData, chatHistory, conversationHistory } }
+      let lastActiveCharacterId = null;
+
+      // Inisialisasi UI
+      document.addEventListener("DOMContentLoaded", function () {
+        // Pilih avatar (di layar pembuatan karakter)
+        let selectedAvatar = "1";
+
+        avatarOptions.forEach((option) => {
+          option.addEventListener("click", function () {
+            avatarOptions.forEach((opt) => opt.classList.remove("selected"));
+            this.classList.add("selected");
+            selectedAvatar = this.dataset.avatar;
+
+            // Perbarui avatar di currentCharacter dan tampilan segera
+            currentCharacter.avatar = `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${selectedAvatar}`;
+            updateCharacterAvatarDisplay();
+          });
+        });
+
+        // Buat karakter
+        document
+          .getElementById("create-character-btn")
+          .addEventListener("click", function () {
+            const nameInput = document.getElementById("character-name-input");
+            const characterName = nameInput.value.trim();
+
+            if (!characterName) {
+              showCustomConfirm(
+                "Silakan masukkan nama karakter terlebih dahulu!",
+                () => {
+                  nameInput.focus();
+                }
+              );
+              return;
+            }
+
+            // Inisialisasi karakter baru
+            currentCharacter.characterId = crypto.randomUUID(); // Buat ID unik
+            currentCharacter.name = characterName;
+            currentCharacter.gender = document.querySelector(
+              'input[name="character-gender"]:checked'
+            ).value;
+
+            // Jika belum ada avatar kustom, gunakan avatar yang dipilih dari opsi
+            if (!currentCharacter.avatar.startsWith("data:image/")) {
+              currentCharacter.avatar = `https://api.dicebear.com/7.x/bottts-neutral/svg?seed=${selectedAvatar}`;
+            }
+
+            // Siapkan riwayat awal untuk karakter baru
+            let genderPrompt = "";
+            if (currentCharacter.gender === "female") {
+              genderPrompt =
+                "Bersikaplah seperti perempuan yang ramah dan sopan tidak seperti ai perannya.";
+            } else if (currentCharacter.gender === "male") {
+              genderPrompt =
+                "Bersikaplah seperti laki-laki yang ramah dan sopan tidak seperti ai perannya.";
+            } else {
+              genderPrompt =
+                "Bersikaplah ramah dan sopan tidak seperti ai dalami perannya.";
+            }
+
+            currentConversationHistory = [
+              {
+                role: "user",
+                parts: [
+                  {
+                    text: `Kamu adalah '${currentCharacter.name}'. ${genderPrompt} Jawablah dalam bahasa Indonesia kecuali diminta untuk menggunakan bahasa lain.`,
+                  },
+                ],
+              },
+              {
+                role: "model",
+                parts: [
+                  {
+                    text: `Halo! Saya ${currentCharacter.name}, Ada yang bisa saya bantu hari ini?`,
+                  },
+                ],
+              },
+            ];
+
+            currentChatHistory = [
+              {
+                sender: "ai",
+                message: `Halo! Saya ${currentCharacter.name}, Ada yang bisa saya bantu hari ini?`,
+              },
+            ];
+
+            lastActiveCharacterId = currentCharacter.characterId;
+            saveChatToLocal(); // Simpan karakter baru dan riwayatnya
+
+            // Update UI chat
+            document.getElementById("character-name").textContent =
+              currentCharacter.name;
+            updateCharacterAvatarDisplay();
+            document.getElementById(
+              "typing-text"
+            ).textContent = `${currentCharacter.name} sedang mengetik`;
+
+            // Sembunyikan modal dan tampilkan chat
+            document.getElementById("character-creation").style.display =
+              "none";
+            document
+              .getElementById("chat-container")
+              .classList.remove("hidden");
+
+            // Tampilkan pesan sambutan
+            const chatWindow = document.getElementById("chat-window");
+            chatWindow.innerHTML = "";
+            displayMessage(currentConversationHistory[1].parts[0].text, "ai");
+          });
+
+        restoreChatFromLocal(); // Panggil pemulihan saat halaman dimuat
+      });
+
+      // Referensi Elemen DOM Chat
+      const chatWindow = document.getElementById("chat-window");
+      const messageInput = document.getElementById("message-input");
+      const sendButton = document.getElementById("send-button");
+      const typingIndicator = document.getElementById("typing-indicator");
+      const clearChatDisplayButton =
+        document.getElementById("clear-chat-display");
+      const characterAvatar = document.getElementById("character-avatar");
+
+      // Pengaturan Profil Modal
+      const profileSettingsModal = document.getElementById("profile-settings");
+      const closeProfileSettingsBtn = document.getElementById(
+        "close-profile-settings-btn"
+      );
+      const viewHistoryBtn = document.getElementById("view-history-btn");
+      const deleteHistoryBtn = document.getElementById("delete-history-btn"); // Ini akan menghapus chat karakter aktif
+
+      // Riwayat Chat Modal
+      const chatHistoryModal = document.getElementById("chat-history-modal");
+      const chatHistoryList = document.getElementById("chat-history-list");
+      const closeHistoryModalBtn = document.getElementById(
+        "close-history-modal-btn"
+      );
+
+      // API KEY GEMINI ANDA.
+      // PERINGATAN: JANGAN PERNAH MENYIMPAN API KEY LANGSUNG DI KODE FRONTEND UNTUK APLIKASI PRODUKSI!
+      const GEMINI_API_KEY = "AIzaSyC8jy1kdr27LqbnDxjKIDNKJNOKEndGHc8"; // Ganti dengan API key Anda yang sebenarnya
+      const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`;
+
+      // Event listeners
+      sendButton.addEventListener("click", sendMessage);
+      messageInput.addEventListener("input", function () {
+        this.style.height = "auto";
+        this.style.height = this.scrollHeight + "px";
+      });
+
+      clearChatDisplayButton.addEventListener("click", clearDisplayOnly);
+      deleteHistoryBtn.addEventListener("click", deleteAllCharacterHistories); // Panggil fungsi baru
+      characterAvatar.addEventListener("click", openProfileSettings);
+      closeProfileSettingsBtn.addEventListener("click", closeProfileSettings);
+      viewHistoryBtn.addEventListener("click", openChatHistory);
+      closeHistoryModalBtn.addEventListener("click", closeChatHistory);
+      document.getElementById("logout-btn").addEventListener("click", logout);
+
+      // Fungsi untuk menampilkan pesan di UI
+      function displayMessage(
+        text,
+        sender,
+        isError = false,
+        messageId = Date.now()
+      ) {
+        const messageWrapper = document.createElement("div");
+        messageWrapper.classList.add("flex", "message-item", "group");
+        messageWrapper.dataset.messageId = messageId;
+
+        const messageContainer = document.createElement("div");
+        messageContainer.classList.add("relative");
+
+        const messageElement = document.createElement("div");
+        messageElement.classList.add(
+          "p-3",
+          "rounded-lg",
+          "max-w-xs",
+          "sm:max-w-md",
+          "shadow",
+          "message-enter"
+        );
+        messageElement.textContent = text;
+
+        if (sender === "user") {
+          messageWrapper.classList.add("justify-end");
+          messageElement.classList.add(
+            "bg-sky-600",
+            "text-white",
+            "rounded-br-none"
+          );
+
+          // Hapus bagian ini untuk menghilangkan tombol edit dan hapus pada pesan individual
+          /*
+          const actionsDiv = document.createElement("div");
+          actionsDiv.classList.add(
+            "message-actions",
+            "flex",
+            "space-x-2",
+            "mt-2",
+            "justify-end"
+          );
+
+          const editButton = document.createElement("button");
+          editButton.classList.add(
+            "text-slate-400",
+            "hover:text-sky-400",
+            "p-1"
+          );
+          editButton.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg>';
+          editButton.title = "Edit pesan";
+          editButton.addEventListener("click", () =>
+            editMessage(messageId, text)
+          );
+
+          const deleteButton = document.createElement("button");
+          deleteButton.classList.add(
+            "text-slate-400",
+            "hover:text-red-400",
+            "p-1"
+          );
+          deleteButton.innerHTML =
+            '<svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>';
+          deleteButton.title = "Hapus pesan";
+          deleteButton.addEventListener("click", () =>
+            deleteMessage(messageId)
+          );
+
+          actionsDiv.appendChild(editButton);
+          actionsDiv.appendChild(deleteButton);
+          messageContainer.appendChild(actionsDiv);
+          */
+        } else {
+          messageWrapper.classList.add("justify-start");
+          if (isError) {
+            messageElement.classList.add(
+              "bg-red-500",
+              "text-white",
+              "rounded-bl-none"
+            );
+          } else {
+            messageElement.classList.add(
+              "bg-slate-700",
+              "text-slate-200",
+              "rounded-bl-none"
+            );
+          }
+        }
+
+        messageContainer.appendChild(messageElement);
+        messageWrapper.appendChild(messageContainer);
+        chatWindow.appendChild(messageWrapper);
+
+        requestAnimationFrame(() => {
+          messageElement.classList.add("message-enter-active");
+        });
+
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+        return messageId;
+      }
+
+      // Fungsi untuk mengedit pesan (tetap ada, tapi tidak dipanggil dari UI lagi)
+      async function editMessage(messageId, currentText) {
+        const newText = prompt("Edit pesan:", currentText);
+        if (newText !== null && newText !== currentText) {
+          const userMessageElement = document.querySelector(
+            `.message-item[data-message-id="${messageId}"] div[class*="bg-sky-600"]`
+          );
+          if (userMessageElement) {
+            userMessageElement.textContent = newText;
+          }
+
+          const userIndex = currentConversationHistory.findIndex(
+            (msg) => msg.role === "user" && msg.parts[0].text === currentText
+          );
+
+          if (userIndex !== -1) {
+            currentConversationHistory[userIndex].parts[0].text = newText;
+
+            if (currentConversationHistory[userIndex + 1]?.role === "model") {
+              currentConversationHistory.splice(userIndex + 1, 1);
+
+              const nextMessageElement = document.querySelector(
+                `.message-item[data-message-id="${messageId}"] + .message-item`
+              );
+              if (nextMessageElement) {
+                nextMessageElement.remove();
+              }
+            }
+
+            typingIndicator.classList.remove("hidden");
+
+            try {
+              const payload = {
+                contents: currentConversationHistory,
+                generationConfig: {
+                  temperature: 0.7,
+                  maxOutputTokens: 1000,
+                },
+                safetySettings: [
+                  {
+                    category: "HARM_CATEGORY_HARASSMENT",
+                    threshold: "BLOCK_ONLY_HIGH",
+                  },
+                  {
+                    category: "HARM_CATEGORY_HATE_SPEECH",
+                    threshold: "BLOCK_ONLY_HIGH",
+                  },
+                  {
+                    category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                    threshold: "BLOCK_ONLY_HIGH",
+                  },
+                  {
+                    category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                    threshold: "BLOCK_ONLY_HIGH",
+                  },
+                ],
+              };
+
+              const response = await fetch(GEMINI_API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+              });
+
+              const data = await response.json();
+              const aiResponse =
+                data.candidates?.[0]?.content?.parts?.[0]?.text ||
+                "Maaf, saya tidak dapat memberikan respons saat ini.";
+
+              displayMessage(aiResponse, "ai");
+              currentConversationHistory.push({
+                role: "model",
+                parts: [{ text: aiResponse }],
+              });
+
+              const chatIndex = currentChatHistory.findIndex(
+                (msg) => msg.message === currentText
+              );
+              if (chatIndex !== -1) {
+                currentChatHistory[chatIndex].message = newText;
+              }
+            } catch (error) {
+              console.error("Error:", error);
+              displayMessage(`Terjadi kesalahan: ${error.message}`, "ai", true);
+            } finally {
+              typingIndicator.classList.add("hidden");
+              saveChatToLocal();
+            }
+          }
+        }
+      }
+
+      // Fungsi untuk menghapus pesan (tetap ada, tapi tidak dipanggil dari UI lagi)
+      function deleteMessage(messageId) {
+        showCustomConfirm(
+          "Apakah Anda yakin ingin menghapus pesan ini?",
+          () => {
+            const messageElement = document.querySelector(
+              `.message-item[data-message-id="${messageId}"]`
+            );
+            if (messageElement) {
+              const messageText = messageElement.querySelector(
+                'div[class*="bg-sky-600"], div[class*="bg-slate-700"]'
+              ).textContent;
+
+              messageElement.remove();
+
+              currentConversationHistory = currentConversationHistory.filter(
+                (msg) =>
+                  !(msg.role === "user" && msg.parts[0].text === messageText)
+              );
+
+              currentChatHistory = currentChatHistory.filter(
+                (msg) => msg.message !== messageText
+              );
+              saveChatToLocal();
+            }
+          }
+        );
+      }
+
+      // Fungsi untuk menghapus hanya tampilan chat (tidak menghapus riwayat)
+      function clearDisplayOnly() {
+        showCustomConfirm(
+          "Apakah Anda yakin ingin menghapus tampilan percakapan?",
+          () => {
+            chatWindow.innerHTML = "";
+
+            let genderPrompt = "";
+            if (currentCharacter.gender === "female") {
+              genderPrompt =
+                "Bersikaplah seperti perempuan yang ramah dan sopan tidak seperti ai perannya.";
+            } else if (currentCharacter.gender === "male") {
+              genderPrompt =
+                "Bersikaplah seperti laki-laki yang ramah dan sopan tidak seperti ai perannya.";
+            } else {
+              genderPrompt =
+                "Bersikaplah ramah dan sopan tidak seperti ai dalami perannya.";
+            }
+
+            currentConversationHistory = [
+              {
+                role: "user",
+                parts: [
+                  {
+                    text: `Kamu adalah asisten AI yang bernama '${currentCharacter.name}'. ${genderPrompt} Jawablah dalam bahasa Indonesia kecuali diminta untuk menggunakan bahasa lain.`,
+                  },
+                ],
+              },
+              {
+                role: "model",
+                parts: [
+                  {
+                    text: `Halo! Saya ${currentCharacter.name}, Ada yang bisa saya bantu hari ini?`,
+                  },
+                ],
+              },
+            ];
+
+            currentChatHistory = [
+              {
+                sender: "ai",
+                message: `Halo! Saya ${currentCharacter.name}, Ada yang bisa saya bantu hari ini?`,
+              },
+            ];
+            displayMessage(currentChatHistory[0].message, "ai"); // Tampilkan pesan sambutan baru
+            saveChatToLocal(); // Simpan perubahan ke local storage
+          }
+        );
+      }
+
+      // Fungsi untuk menghapus SEMUA riwayat chat dari semua karakter
+      function deleteAllCharacterHistories() {
+        // Hapus semua data karakter tanpa konfirmasi
+        allCharactersChatData = {}; // Kosongkan semua data karakter
+        localStorage.setItem(
+          "allCharactersChatData",
+          JSON.stringify(allCharactersChatData)
+        );
+
+        // Lakukan logout untuk mereset aplikasi ke layar pembuatan karakter
+        logout(false); // Panggil logout tanpa konfirmasi tambahan
+      }
+
+      // Fungsi untuk menghapus chat karakter dari daftar riwayat (di modal riwayat chat)
+      function deleteCharacterFromHistoryList(characterIdToDelete) {
+        if (characterIdToDelete === lastActiveCharacterId) {
+          // Jika karakter yang akan dihapus adalah karakter yang sedang aktif
+          showCustomConfirm(
+            "Chat karakter yang sedang aktif tidak dapat dihapus. Silakan logout terlebih dahulu.",
+            () => {}
+          );
+        } else {
+          // Jika bukan karakter aktif, langsung hapus tanpa konfirmasi tambahan
+          if (allCharactersChatData[characterIdToDelete]) {
+            delete allCharactersChatData[characterIdToDelete];
+            localStorage.setItem(
+              "allCharactersChatData",
+              JSON.stringify(allCharactersChatData)
+            );
+
+            // Perbarui tampilan daftar riwayat
+            openChatHistory(); // Memuat ulang daftar riwayat
+          }
+        }
+      }
+
+      // Fungsi untuk mengirim pesan
+      async function sendMessage() {
+        const messageText = messageInput.value.trim();
+        if (messageText === "") return;
+
+        displayMessage(messageText, "user");
+        currentConversationHistory.push({
+          role: "user",
+          parts: [{ text: messageText }],
+        });
+
+        currentChatHistory.push({ sender: "user", message: messageText });
+        saveChatToLocal();
+
+        messageInput.value = "";
+        messageInput.focus();
+
+        typingIndicator.classList.remove("hidden");
+
+        try {
+          const payload = {
+            contents: currentConversationHistory,
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 1000,
+            },
+            safetySettings: [
+              {
+                category: "HARM_CATEGORY_HARASSMENT",
+                threshold: "BLOCK_ONLY_HIGH",
+              },
+              {
+                category: "HARM_CATEGORY_HATE_SPEECH",
+                threshold: "BLOCK_ONLY_HIGH",
+              },
+              {
+                category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                threshold: "BLOCK_ONLY_HIGH",
+              },
+              {
+                category: "HARM_CATEGORY_DANGEROUS_CONTENT",
+                threshold: "BLOCK_ONLY_HIGH",
+              },
+            ],
+          };
+
+          const response = await fetch(GEMINI_API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload),
+          });
+
+          const data = await response.json();
+
+          if (!response.ok) {
+            const errorMessage =
+              data.error?.message ||
+              data[0]?.error?.message ||
+              "Gagal mendapatkan respons dari API";
+            throw new Error(errorMessage);
+          }
+
+          const aiResponse =
+            data.candidates?.[0]?.content?.parts?.[0]?.text ||
+            "Maaf, saya tidak dapat memberikan respons saat ini.";
+
+          displayMessage(aiResponse, "ai");
+          currentConversationHistory.push({
+            role: "model",
+            parts: [{ text: aiResponse }],
+          });
+
+          currentChatHistory.push({ sender: "ai", message: aiResponse });
+          saveChatToLocal();
+        } catch (error) {
+          console.error("Error:", error);
+          displayMessage(`Terjadi kesalahan: ${error.message}`, "ai", true);
+
+          if (
+            error.message.includes("API key") ||
+            error.message.includes("authentication")
+          ) {
+            displayMessage(
+              "Pastikan API key Anda valid dan memiliki akses ke Gemini API.",
+              "ai",
+              true
+            );
+          }
+        } finally {
+          typingIndicator.classList.add("hidden");
+        }
+      }
+
+      // Fungsi untuk membuka modal pengaturan profil
+      function openProfileSettings() {
+        profileSettingsModal.classList.remove("hidden");
+        document.getElementById("chat-container").classList.add("hidden");
+      }
+
+      // Fungsi untuk menutup modal pengaturan profil
+      function closeProfileSettings() {
+        profileSettingsModal.classList.add("hidden");
+        document.getElementById("chat-container").classList.remove("hidden");
+      }
+
+      // Fungsi untuk membuka modal riwayat chat
+      function openChatHistory() {
+        chatHistoryModal.classList.remove("hidden");
+        profileSettingsModal.classList.add("hidden");
+        chatHistoryList.innerHTML = ""; // Bersihkan daftar riwayat sebelum menampilkan
+
+        const storedData = localStorage.getItem("allCharactersChatData");
+        allCharactersChatData = storedData ? JSON.parse(storedData) : {};
+
+        if (Object.keys(allCharactersChatData).length === 0) {
+          chatHistoryList.innerHTML =
+            '<p class="text-slate-400 text-center">Tidak ada riwayat chat yang tersimpan.</p>';
+          return;
+        }
+
+        // Tampilkan riwayat chat per karakter
+        for (const charId in allCharactersChatData) {
+          const charData = allCharactersChatData[charId].characterData;
+          const charChatHistory = allCharactersChatData[charId].chatHistory;
+
+          const chatItem = document.createElement("div");
+          chatItem.classList.add(
+            "p-3",
+            "rounded-lg",
+            "text-sm",
+            "border",
+            "border-slate-700",
+            "flex",
+            "items-center",
+            "justify-between",
+            "space-x-3"
+          );
+
+          const lastMessage =
+            charChatHistory.length > 0
+              ? charChatHistory[charChatHistory.length - 1].message
+              : "Belum ada pesan.";
+
+          chatItem.innerHTML = `
+            <div class="flex items-center space-x-3 flex-grow">
+                <img src="${charData.avatar}" alt="Avatar ${charData.name}" class="w-10 h-10 rounded-full border-2 border-sky-500 object-cover">
+                <div>
+                    <p class="font-semibold text-sky-400">${charData.name}</p>
+                    <p class="text-slate-300 text-xs truncate">${lastMessage}</p>
+                </div>
+            </div>
+            <div class="flex space-x-2">
+                <button class="restore-chat-btn bg-emerald-600 text-white py-1 px-3 rounded-lg hover:bg-emerald-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-colors duration-150 font-medium text-xs" data-char-id="${charId}">Pulihkan</button>
+                <button class="delete-history-list-btn bg-red-600 text-white py-1 px-3 rounded-lg hover:bg-red-500 focus:outline-none focus:ring-2 focus:ring-red-500 transition-colors duration-150 font-medium text-xs" data-char-id="${charId}">Hapus</button>
+            </div>
+          `;
+          chatHistoryList.appendChild(chatItem);
+        }
+
+        // Tambahkan event listener untuk tombol pulihkan
+        document.querySelectorAll(".restore-chat-btn").forEach((button) => {
+          button.addEventListener("click", function () {
+            const charIdToRestore = this.dataset.charId;
+            restoreCharacterChat(charIdToRestore);
+          });
+        });
+
+        // Tambahkan event listener untuk tombol hapus di daftar riwayat
+        document
+          .querySelectorAll(".delete-history-list-btn")
+          .forEach((button) => {
+            button.addEventListener("click", function () {
+              const charIdToDelete = this.dataset.charId;
+              deleteCharacterFromHistoryList(charIdToDelete);
+            });
+          });
+      }
+
+      // Fungsi untuk memulihkan chat karakter tertentu
+      function restoreCharacterChat(characterIdToRestore) {
+        const storedData = localStorage.getItem("allCharactersChatData");
+        allCharactersChatData = storedData ? JSON.parse(storedData) : {};
+
+        if (allCharactersChatData[characterIdToRestore]) {
+          const dataToRestore = allCharactersChatData[characterIdToRestore];
+          currentCharacter = dataToRestore.characterData;
+          currentChatHistory = dataToRestore.chatHistory;
+          currentConversationHistory = dataToRestore.conversationHistory;
+          lastActiveCharacterId = characterIdToRestore;
+          saveChatToLocal(); // Simpan lastActiveCharacterId yang baru
+
+          // Update UI
+          document.getElementById("character-name").textContent =
+            currentCharacter.name;
+          updateCharacterAvatarDisplay();
+          document.getElementById(
+            "typing-text"
+          ).textContent = `${currentCharacter.name} sedang mengetik`;
+
+          chatWindow.innerHTML = "";
+          currentChatHistory.forEach((chat) => {
+            displayMessage(chat.message, chat.sender);
+          });
+
+          closeChatHistory(); // Tutup modal riwayat
+          document.getElementById("chat-container").classList.remove("hidden"); // Tampilkan kembali chat
+        } else {
+          showCustomConfirm(
+            "Riwayat chat untuk karakter ini tidak ditemukan.",
+            () => {}
+          );
+        }
+      }
+
+      // Fungsi untuk menutup modal riwayat chat
+      function closeChatHistory() {
+        chatHistoryModal.classList.add("hidden");
+        profileSettingsModal.classList.remove("hidden");
+      }
+
+      // Fungsi untuk logout
+      // Parameter `confirmLogout` ditambahkan untuk mengontrol apakah konfirmasi ditampilkan
+      function logout(confirmLogout = true) {
+        if (confirmLogout) {
+          showCustomConfirm(
+            "Apakah Anda yakin ingin logout? Ini akan kembali ke layar pembuatan karakter.",
+            () => {
+              // onConfirm callback (jika user klik 'Ya')
+              lastActiveCharacterId = null; // Hapus karakter aktif terakhir
+              saveChatToLocal(); // Simpan perubahan
+
+              // Reset variabel global
+              currentCharacter = {
+                characterId: null,
+                name: "Gemini AI",
+                gender: "neutral",
+                avatar:
+                  "https://api.dicebear.com/7.x/bottts-neutral/svg?seed=default",
+              };
+              currentConversationHistory = [];
+              currentChatHistory = [];
+
+              // Kosongkan chat window dan tampilkan layar pembuatan karakter
+              document.getElementById("chat-window").innerHTML = "";
+              document.getElementById("chat-container").classList.add("hidden");
+              document
+                .getElementById("profile-settings")
+                .classList.add("hidden");
+              document.getElementById("character-creation").style.display =
+                "flex";
+
+              // Reset pilihan avatar di layar pembuatan karakter
+              avatarOptions.forEach((opt) => opt.classList.remove("selected"));
+              avatarOptions[0].classList.add("selected");
+              document.getElementById("character-name-input").value = "";
+              document.querySelector(
+                'input[name="character-gender"][value="female"]'
+              ).checked = true;
+              document.getElementById("custom-avatar-upload").value = ""; // Clear file input
+            },
+            () => {
+              // onCancel callback (jika user klik 'Tidak')
+              // Tidak melakukan apa-apa, tetap di layar saat ini dengan chat yang ada
+              // Modal akan otomatis tertutup oleh showCustomConfirm
+            }
+          );
+        } else {
+          // Logika logout langsung tanpa konfirmasi
+          lastActiveCharacterId = null;
+          saveChatToLocal();
+
+          currentCharacter = {
+            characterId: null,
+            name: "Gemini AI",
+            gender: "neutral",
+            avatar:
+              "https://api.dicebear.com/7.x/bottts-neutral/svg?seed=default",
+          };
+          currentConversationHistory = [];
+          currentChatHistory = [];
+
+          document.getElementById("chat-window").innerHTML = "";
+          document.getElementById("chat-container").classList.add("hidden");
+          document.getElementById("profile-settings").classList.add("hidden");
+          document.getElementById("character-creation").style.display = "flex";
+
+          avatarOptions.forEach((opt) => opt.classList.remove("selected"));
+          avatarOptions[0].classList.add("selected");
+          document.getElementById("character-name-input").value = "";
+          document.querySelector(
+            'input[name="character-gender"][value="female"]'
+          ).checked = true;
+          document.getElementById("custom-avatar-upload").value = "";
+        }
+      }
+
+      // Simpan chat saat diperbarui
+      function saveChatToLocal() {
+        if (currentCharacter.characterId) {
+          allCharactersChatData[currentCharacter.characterId] = {
+            characterData: currentCharacter,
+            chatHistory: currentChatHistory,
+            conversationHistory: currentConversationHistory,
+          };
+          localStorage.setItem(
+            "allCharactersChatData",
+            JSON.stringify(allCharactersChatData)
+          );
+          localStorage.setItem(
+            "lastActiveCharacterId",
+            currentCharacter.characterId
+          );
+        } else {
+          // Jika tidak ada karakter aktif, hapus data karakter terakhir
+          localStorage.removeItem("lastActiveCharacterId");
+        }
+      }
+
+      // Pulihkan chat saat dimuat
+      function restoreChatFromLocal() {
+        const storedAllCharactersData = localStorage.getItem(
+          "allCharactersChatData"
+        );
+        allCharactersChatData = storedAllCharactersData
+          ? JSON.parse(storedAllCharactersData)
+          : {};
+
+        const storedLastActiveId = localStorage.getItem(
+          "lastActiveCharacterId"
+        );
+
+        if (storedLastActiveId && allCharactersChatData[storedLastActiveId]) {
+          const dataToRestore = allCharactersChatData[storedLastActiveId];
+          currentCharacter = dataToRestore.characterData;
+          currentChatHistory = dataToRestore.chatHistory;
+          currentConversationHistory = dataToRestore.conversationHistory;
+          lastActiveCharacterId = storedLastActiveId;
+
+          document.getElementById("character-name").textContent =
+            currentCharacter.name;
+          updateCharacterAvatarDisplay();
+          document.getElementById(
+            "typing-text"
+          ).textContent = `${currentCharacter.name} sedang mengetik`;
+
+          document.getElementById("character-creation").style.display = "none";
+          document.getElementById("chat-container").classList.remove("hidden");
+
+          document.getElementById("chat-window").innerHTML = "";
+          currentChatHistory.forEach((chat) => {
+            displayMessage(chat.message, chat.sender);
+          });
+        } else {
+          // Jika tidak ada riwayat yang valid, tampilkan layar pembuatan karakter
+          document.getElementById("character-creation").style.display = "flex";
+          document.getElementById("chat-container").classList.add("hidden");
+        }
+      }
+
+      // Fungsi untuk menampilkan modal konfirmasi kustom
+      // Fungsi ini tetap ada untuk konfirmasi lain (misal edit/hapus pesan individual)
+      function showCustomConfirm(message, onConfirm, onCancel) {
+        const modal = document.createElement("div");
+        modal.classList.add(
+          "fixed",
+          "inset-0",
+          "bg-slate-900/90",
+          "backdrop-blur-sm",
+          "flex",
+          "items-center",
+          "justify-center",
+          "p-4",
+          "z-[9999]"
+        );
+        modal.innerHTML = `
+          <div class="bg-slate-800 rounded-xl max-w-sm w-full p-6 shadow-2xl border border-slate-700">
+            <p class="text-slate-200 text-center mb-6">${message}</p>
+            <div class="flex justify-around space-x-4">
+              <button id="confirm-yes" class="bg-sky-600 text-white py-2 px-4 rounded-lg hover:bg-sky-500 focus:outline-none focus:ring-2 focus:ring-sky-500 transition-colors duration-150 font-medium w-full">Ya</button>
+              <button id="confirm-no" class="bg-slate-600 text-white py-2 px-4 rounded-lg hover:bg-slate-500 focus:outline-none focus:ring-2 focus:ring-slate-500 transition-colors duration-150 font-medium w-full">Tidak</button>
+            </div>
+          </div>
+        `;
+        document.body.appendChild(modal);
+
+        document.getElementById("confirm-yes").addEventListener("click", () => {
+          onConfirm();
+          modal.remove();
+        });
+
+        document.getElementById("confirm-no").addEventListener("click", () => {
+          if (onCancel) {
+            onCancel();
+          }
+          modal.remove();
+        });
+      }
+    </script>
+  </body>
+</html>
